@@ -1,0 +1,90 @@
+<!-- saved from url=(0065)http://math.hws.edu/graphicsbook/source/webgl/simple-texture.html -->
+<!-- modified by Mohammad Imrul Jubair -->
+
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>LAB-1: Intro</title>
+<canvas id="webglcanvas" width="700" height="500"></canvas>
+
+<script>
+
+var vertexShaderSource =
+
+       `attribute vec3 a_coords;
+        void main() {
+            gl_Position = vec4(a_coords, 1.0);
+            //gl_PointSize = 30.0;
+        }`;
+
+
+var fragmentShaderSource =
+
+       `void main() {
+            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }`;
+
+var gl;
+var a_coords_location;
+var a_coords_buffer;
+
+function draw() {
+	
+
+    gl.clearColor(0.0,0.0,0.0,1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    var coords = new Float32Array( [-0.5,0.0,0.0, 0.0,0.5,0.0, 0.5,0.0,0.0, -0.5,-0.1,0.0, 0.0,-0.5,0.0, 0.5,-0.1,0.0 ] );
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, a_coords_buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, coords, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(a_coords_location, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(a_coords_location);
+
+    //gl.drawArrays(gl.POINTS, 1, 3);
+	gl.drawArrays(gl.TRIANGLES, 3,3);
+}
+
+
+
+function createProgram(gl, vertexShaderSource, fragmentShaderSource) {
+  var vsh = gl.createShader( gl.VERTEX_SHADER );
+  gl.shaderSource( vsh, vertexShaderSource );
+  gl.compileShader( vsh );
+
+  var fsh = gl.createShader( gl.FRAGMENT_SHADER );
+  gl.shaderSource( fsh, fragmentShaderSource );
+  gl.compileShader( fsh );
+
+  var prog = gl.createProgram();
+  gl.attachShader( prog, vsh );
+  gl.attachShader( prog, fsh );
+  gl.linkProgram( prog );
+
+  return prog;
+}
+
+
+function initGL() {
+    var prog = createProgram( gl, vertexShaderSource, fragmentShaderSource );
+    gl.useProgram(prog);
+
+    a_coords_location = gl.getAttribLocation(prog, "a_coords");
+    a_coords_buffer = gl.createBuffer();
+}
+
+
+function init() {
+    var canvas = document.getElementById("webglcanvas");
+    gl = canvas.getContext("webgl");
+    initGL();
+    draw();
+}
+
+init();
+
+</script>
+
+
+
+</html>

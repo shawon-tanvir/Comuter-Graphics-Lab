@@ -1,0 +1,143 @@
+<!-- saved from url=(0065)http://math.hws.edu/graphicsbook/source/webgl/simple-texture.html -->
+<!-- modified by Mohammad Imrul Jubair -->
+
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Multiple Shaders</title>
+<canvas id="webglcanvas" width="500" height="500"></canvas>
+
+<script>
+
+/* shaders to draw the big point*/
+
+var vertexShaderSource_1 =
+
+       `attribute vec3 a_coords;
+        void main() {
+            gl_Position = vec4(a_coords, 1.0);
+            gl_PointSize = 20.0;
+        }`;
+
+
+var fragmentShaderSource_1 =
+
+       `void main() {
+            gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+        }`;
+
+
+/* shaders to draw the small point*/
+
+var vertexShaderSource_2 =
+
+       `attribute vec3 a_coords;
+        void main() {
+            gl_Position = vec4(a_coords, 1.0);
+            gl_PointSize = 10.0;
+        }`;
+
+
+var fragmentShaderSource_2 =
+
+       `void main() {
+            gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+        }`;
+
+var gl;
+var a_coords_location_1;
+var a_coords_buffer_1;
+
+var a_coords_location_2;
+var a_coords_buffer_2;
+
+
+/*draw the big point*/
+function draw_1() {
+
+    gl.clearColor(0.0,0.0,0.0,1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    var coords = new Float32Array( [0.0, 0.0, 0.0] );
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, a_coords_buffer_1);
+    gl.bufferData(gl.ARRAY_BUFFER, coords, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(a_coords_location_1, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(a_coords_location_1);
+
+    gl.drawArrays(gl.POINTS, 0, 1);
+	gl.deleteBuffer(a_coords_buffer_1);
+}
+
+
+/*draw the small point*/
+function draw_2() {
+
+    var coords_2 = new Float32Array( [0.2, 0.2, 0.0] );
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, a_coords_buffer_2);
+    gl.bufferData(gl.ARRAY_BUFFER, coords_2, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(a_coords_location_2, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(a_coords_location_2);
+
+    gl.drawArrays(gl.POINTS, 0, 1);
+	gl.deleteBuffer(a_coords_buffer_2);
+}
+
+
+function createProgram(gl, vertexShaderSource, fragmentShaderSource) {
+  var vsh = gl.createShader( gl.VERTEX_SHADER );
+  gl.shaderSource( vsh, vertexShaderSource );
+  gl.compileShader( vsh );
+
+  var fsh = gl.createShader( gl.FRAGMENT_SHADER );
+  gl.shaderSource( fsh, fragmentShaderSource );
+  gl.compileShader( fsh );
+
+  var prog = gl.createProgram();
+  gl.attachShader( prog, vsh );
+  gl.attachShader( prog, fsh );
+  gl.linkProgram( prog );
+
+  return prog;
+}
+
+/*initialization for the big point*/
+function initGL_1() {
+    var prog_1 = createProgram(gl, vertexShaderSource_1, fragmentShaderSource_1);
+    gl.useProgram(prog_1);
+
+    a_coords_location_1 = gl.getAttribLocation(prog_1, "a_coords");
+    a_coords_buffer_1 = gl.createBuffer();
+}
+
+/*initialization for the small point*/
+function initGL_2() {
+	var prog_2 = createProgram( gl, vertexShaderSource_2, fragmentShaderSource_2);
+    gl.useProgram(prog_2);
+	
+	a_coords_location_2 = gl.getAttribLocation(prog_2, "a_coords");
+    a_coords_buffer_2 = gl.createBuffer();
+}
+
+
+function init() {
+    var canvas = document.getElementById("webglcanvas");
+    gl = canvas.getContext("webgl");
+    
+	/*first draw the big point then the small one*/
+	
+	initGL_1();
+    draw_1();
+	
+	initGL_2();
+    draw_2();
+}
+
+init();
+
+</script>
+
+
+
+</html>

@@ -1,0 +1,112 @@
+<!-- saved from url=(0065)http://math.hws.edu/graphicsbook/source/webgl/simple-texture.html -->
+<!-- 01000010 00110001 01000001 00110010 
+11011011 11111111 -->
+<!-- modified by Mohammad Imrul Jubair -->
+
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Online - 2: Section:C ID:160104138 </title>
+<canvas id="webglcanvas" width="500" height="500"></canvas>
+
+<script>
+
+var vertexShaderSource =
+
+		`attribute vec3 a_coords;
+		attribute vec3 a_colors;
+		varying vec3 v_color;
+		uniform float u_coords;
+		void main(){
+			gl_Position=vec4(a_coords.x,a_coords.y+u_coords,a_coords.z,1.0);
+			v_color=a_colors;
+		}`;
+
+
+var fragmentShaderSource =
+
+		`precision highp float;
+		
+		varying vec3 v_color;
+		void main(){
+			gl_FragColor=vec4(v_color,1.0);
+		}`;
+
+
+var gl;
+var a_coords_location;
+var a_coords_buffer;
+
+function draw() {
+
+    gl.clearColor(0.0,0.0,0.0,1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+	
+	var coords=new Float32Array([0.0,0.0,0.0, 0.0,0.5,0.0, 0.5,0.0,0.0 ]);
+	var colors=new Float32Array([1.0,0.0,0.0, 0.0,1.0,0.0, 0.0,0.0,1.0 ]);
+	var u_coord=0.0;
+	
+	gl.bindBuffer(gl.ARRAY_BUFFER, a_coords_buffer);
+	gl.bufferData(gl.ARRAY_BUFFER,coords,gl.STATIC_DRAW);
+	gl.vertexAttribPointer(a_coords_location,3,gl.FLOAT,false,0,0);
+	gl.enableVertexAttribArray(a_coords_location);
+	
+	gl.bindBuffer(gl.ARRAY_BUFFER, a_colors_buffer);
+	gl.bufferData(gl.ARRAY_BUFFER,colors,gl.STATIC_DRAW);
+	gl.vertexAttribPointer(a_colors_location,3,gl.FLOAT,false,0,0);
+	gl.enableVertexAttribArray(a_colors_location);
+	
+	gl.uniform1f(u_coords_location,u_coord);
+	
+	gl.drawArrays(gl.TRIANGLES,0,3);
+    
+}
+
+
+
+function createProgram(gl, vertexShaderSource, fragmentShaderSource) {
+
+		  var vsh = gl.createShader( gl.VERTEX_SHADER );
+		  gl.shaderSource( vsh, vertexShaderSource );
+		  gl.compileShader( vsh );
+
+		  var fsh = gl.createShader( gl.FRAGMENT_SHADER );
+		  gl.shaderSource( fsh, fragmentShaderSource );
+		  gl.compileShader( fsh );
+
+		  var prog = gl.createProgram();
+		  gl.attachShader( prog, vsh );
+		  gl.attachShader( prog, fsh );
+		  gl.linkProgram( prog );
+
+		  return prog;
+}
+
+
+function initGL() {
+	var prog = createProgram( gl, vertexShaderSource, fragmentShaderSource );
+	gl.useProgram(prog);
+	
+	a_coords_location=gl.getAttribLocation(prog,"a_coords");
+	a_coords_buffer=gl.createBuffer();
+	a_colors_location=gl.getAttribLocation(prog,"a_colors");
+	a_colors_buffer=gl.createBuffer();
+	
+	u_coords_location=gl.getUniformLocation(prog,"u_coords")
+}
+
+
+function init() {
+    	var canvas = document.getElementById("webglcanvas");
+    	gl = canvas.getContext("webgl");
+	    initGL();
+    	draw(); 
+}
+
+init();
+
+</script>
+
+
+
+</html>
